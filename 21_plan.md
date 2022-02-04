@@ -2,6 +2,18 @@
 
 *This is my plan on how to write code for my version of 21. I intend on continuing to write simple methods that accomplish one of so things well and then bundle and bundle more so that the game play is simplified.*
 
+[Implementation Steps](#implementation-steps)
+[Main Processes](#main-processes)
+    [Play Twenty One](#play_twenty_one)
+    [Play Match](#play_match)
+[Subprocesses](#subprocesses)
+    [Initialization](#initialization)
+    [Deal Cards](#deal-cards)
+    [Displays](#displays)
+    [Player's Turn](#players_turn)
+    [Dealer's Turn](#dealers_turn)
+[Auxillary Methods](#auxillary-methods)
+
 ## Examples of Gameplay
 
 ### 1.
@@ -39,6 +51,53 @@ This one is a little tricky, and at first glance, you may think that either a "h
   - repeat until total >= 17
 6. If dealer bust, player wins.
 7. Compare cards and declare winner.
+
+## Constants
+
+- WINNING_VALUE = 21
+- FORCE_DEALER_STAY = 17
+
+- SUITS = %w(S H D C)
+- NUMBERED_RANKS = (2..10).map(&:to_s)
+- ROYAL_RANKS = %w(J Q K)
+- ACE = 'A'
+- RANKS = NUMBERED_RANKS + ROYAL_RANKS + [ACE]
+- SUIT_SYMBOLS = {
+    'S' => "\u2660",
+    'H' => "\u2665",
+    'D' => "\u2666",
+    'C' => "\u2663",
+    '*' => "*"
+  }
+- MESSAGES = {
+    welcome: "Welcome to Twenty-One!",
+    rules: <<~MSG,
+      Rules of the Game:
+      - You and the dealer will each be dealt 2 cards.
+      - You play first, and then the dealer will play.
+      - You can choose to hit (draw) or stay (don't draw).
+      - The hand value is the sum of all card values. Aces can be worth 1 or 11. 
+      - A player busts and loses the game if their hand value exceeds 21.
+      - The greater hand value wins if neither player busts.
+    MSG
+    goodbye: "Thank you for playing Twenty-One. Goodbye!",
+    continue: "Press Enter to continue.",
+    player_turn: "It's your turn.",
+    query_player_action: "Hit or Stay? (h/hit or s/stay)",
+    player_busted: "You busted!",
+    player_won: "You won!",
+    dealer_turn: "It's the dealer's turn.",
+    dealer_stay: "Dealer chose to stay.",
+    dealer_hit: "Dealer chose to hit.",
+    dealer_busted: "Dealer busted!",
+    dealer_won: "Dealer won!",
+    tie: "It's a tie.",
+    game_over: "Game over.",
+    final_hands: "Final hands:",
+    play_again: "Want to play again? (y/yes or n/no)",
+    invalid_input: "Please enter a valid input.",
+    separator_line: '-' * 80
+  }
 
 ## Main processes
 
@@ -97,20 +156,111 @@ This one is a little tricky, and at first glance, you may think that either a "h
 
 #### Calculate Hands
 
-- `hand_total
+- `hand_total`
+    - set local variable to method as `sum`
+    - use Enumerable#reduce with the `value(card[1])`
+    - also, `count` Aces
+    - each `times` and Ace appears, add 10 if sum +10 is less than 21
+- `value`
+    - conditional if numbered, change it `.to_i`
+    - elsif royal, change to 10
+    - elsif `rank` == `ACE`, change it to 1
 
-### Display Hands
+### Displays
 
-### Calculate Hand Total
+#### display_welcome
 
-### Player's turn
+- welcome the user
+- go over rules
+- explain ranks
+- explain ace
+- explain 'hit' and 'stay'
+- explain 'bust'
+- add `ready_to_play` method that accepts enter
+- add `display_loading_animation`
 
-### Dealer's turn
+#### display_cards
 
-### Compare Hands
+- `top_of_card`
+    - `reduce('')` and add `"|#{SUIT_SYMBOLS[card[0]]}  |"
+- `bottom of card
+    - `reduce('')` and add `"|  #{SUIT_SYMBOLS[card[0]]}|"
+- `middle_of_card`
+    - `reduce('')` with ternary for double digit 10
+        - to add `"|#{SUIT_SYMBOLS[card[1]]}  |"
+        - or add `"| #{SUIT_SYMBOLS[card[1]]} |"
 
-### Display Winner
+#### display_hands
 
-### Play again?
+- `empty_line`
+- `top_of_card(cards)`
+- `middle_of_card(cards)`
+- `bottom_of_card(cards)`
+- `empty_line`
+- `display hand total`
 
-### Dislay goodbye
+#### display_state
+
+- `clear_screen`
+- display title
+- prompt your_hand
+- display_hands
+- prompt dealer's cards
+    - conditional for hidden card set true in display_state
+
+#### display_totals
+
+- sleep
+- empty line or separator
+- the dealer's final total is
+- Your hands' is
+- empty line or separator
+
+#### display_results
+
+- first, we must `evaluate_results`
+    - set local vars for `player_total` and `dealer_total`
+    - conditional
+        - first check player bust
+        - dealer bust
+        - player > dealer
+        - dealer > player
+        - else tie
+- display result
+
+#### display_goodbye
+
+- display goodby message
+
+### players_turn
+
+- prompt player's turn
+    - hit or stay
+- set local var `action`
+- enter loop
+    - validate hit or stay with `get_player_action`
+        - have player_action MESSAGE
+        - validate with array of choices `%w(h hit s stay)`
+        - return `:hit` or `:stay` with ternary from `answer.start_with?`
+    - `deal_card!` if action == :hit
+    - display_state with hidden dealer card
+    end loop
+
+### dealers_turn
+
+- prompt dealer's turn
+- enter loop
+    - `display_state`
+    - sleep
+    - conditional for `bust?`
+    - `stay?`
+    - then `deal_card!`
+
+## Auxillary methods
+
+- `prompt`
+- `prompt_pause`
+- `bust?`
+- `dealer_stay?`
+- `play_again?` <!-- pull from ttt -->
+
