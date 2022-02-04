@@ -123,7 +123,7 @@ def dealer_turn(cards, totals)
   prompt MESSAGES[:dealer_turn]
   loop do
     display_hands(cards, totals)
-    sleep(SLEEP_DURATION)
+    # sleep(SLEEP_DURATION)
 
     if bust?(totals[:dealer])
       break
@@ -145,7 +145,7 @@ def deal_cards(cards, totals)
 end
 
 def deal_card!(player, cards, totals)
-  cards[player] = cards[:deck].pop
+  cards[player] << cards[:deck].pop
   totals[player] = hand_total(cards[player])
 end
 
@@ -190,8 +190,8 @@ end
 # Display
 def display_welcome
   clear_screen
-  prompt_pause(:welcome)
-  prompt_pause(:rules)
+  # prompt_pause(:welcome)
+  # prompt_pause(:rules)
   prompt_pause(:continue)
   gets
 end
@@ -208,7 +208,7 @@ def display_hands(cards, totals, hide_dealer_card: false)
   prompt MESSAGES[:players_hand]
   display_cards(cards[:player], totals[:player])
   
-  prompt_pause(:dealer_hand)
+  prompt MESSAGES[:dealer_hand]
   if hide_dealer_card
     display_cards([cards[:dealer][0], ['*', '*']])
   else
