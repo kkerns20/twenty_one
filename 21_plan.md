@@ -145,11 +145,11 @@ This one is a little tricky, and at first glance, you may think that either a "h
 
 ### Deal Cards
 
-- `deal_cards`
+- `deal_cards` arguments player, cards
     - 2 `times` deal:
         - player
         - dealer
-- `deal_card!`
+- `deal_card!` arguments player, cards, total
     - `pop` from `cards[:deck]` to `cards[:player]`
     - use method `total` to calculate value of hand for each player
         - set to `totals[:player]`
@@ -179,18 +179,18 @@ This one is a little tricky, and at first glance, you may think that either a "h
 - add `ready_to_play` method that accepts enter
 - add `display_loading_animation`
 
-#### display_cards
+#### displaying card
 
 - `top_of_card`
-    - `reduce('')` and add `"|#{SUIT_SYMBOLS[card[0]]}  |"
+    - `reduce('')` and add `"|#{SUIT_SYMBOLS[card[0]]}  |"`
 - `bottom of card
-    - `reduce('')` and add `"|  #{SUIT_SYMBOLS[card[0]]}|"
+    - `reduce('')` and add `"|  #{SUIT_SYMBOLS[card[0]]}|"`
 - `middle_of_card`
     - `reduce('')` with ternary for double digit 10
-        - to add `"|#{SUIT_SYMBOLS[card[1]]}  |"
-        - or add `"| #{SUIT_SYMBOLS[card[1]]} |"
+        - to add `"|#{SUIT_SYMBOLS[card[1]]}  |"`
+        - or add `"| #{SUIT_SYMBOLS[card[1]]} |"`
 
-#### display_hands
+#### display_cards
 
 - `empty_line`
 - `top_of_card(cards)`
@@ -199,7 +199,7 @@ This one is a little tricky, and at first glance, you may think that either a "h
 - `empty_line`
 - `display hand total`
 
-#### display_state
+#### display_hands
 
 - `clear_screen`
 - display title
