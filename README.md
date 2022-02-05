@@ -1,5 +1,12 @@
 # Assignment Twenty_One
 
+- [Task](#task)
+- [Rules](#rules)
+- [Setup](#setup)
+- [Card Values](#card-values)
+- [Player's Turn](#players-turn)
+- [Dealer's Turn](#dealers-turn)
+- [Comparing Cards](#comparing-cards)
 ## Task
 
 Build a command line game called twenty_one that is similar to blackjack
@@ -60,6 +67,6 @@ Build a command line game called twenty_one that is similar to blackjack
     - Dealer must always hit *unless* his hand total is 17 or more
 - If dealer busts, then player wins
 
-### Comparing card:
+### Comparing cards:
 
     - When both the player and the dealer stay, it's time to compare the total value of the cards and see who has the highest value.
