@@ -30,6 +30,7 @@ MESSAGES = {
     - A player busts and loses the game if their hand value exceeds 21.
     - The greater hand value wins if neither player busts.
   MSG
+  shuffling: 'Shuffling the deck!',
   thank_you: "Thank you for playing #{WINNING_VALUE}!",
   quote: "Don't cry because it's over, smile because it happened. \n
   - Dr. Seuss",
@@ -61,7 +62,9 @@ YES_OR_NO = %w(y n yes no).freeze
 def play_twenty_one
   display_welcome
   loop do
+    score = { PLAYER => 0, HOUSE => 0 }
     play_match
+    display_tourney_winner(score)
     break unless play_again?
   end
   quit_game
@@ -70,6 +73,8 @@ end
 def play_match
   cards = initialize_cards
   totals = initialize_totals
+  prompt MESSAGES[:shuffling]
+  display_loading_animation
   deal_cards(cards, totals)
   display_hands(cards, totals, hide_dealer_card: true)
   natural_win(cards, totals)
@@ -217,12 +222,16 @@ def display_goodbye
   prompt_pause(:quote)
 end
 
+def display_empty_line
+  puts ''
+end
+
 def display_loading_animation
   3.times do
     print ". "
     sleep 0.5
   end
-  puts
+  display_empty_line
 end
 
 def display_hands(cards, totals, hide_dealer_card: false)
@@ -241,11 +250,11 @@ def display_hands(cards, totals, hide_dealer_card: false)
 end
 
 def display_cards(cards, total = nil)
-  puts
+  display_empty_line
   puts top_of_card(cards)
   puts middle_of_card(cards)
   puts bottom_of_card(cards)
-  puts
+  display_empty_line
   prompt("Hand Total: #{total}", new_line: true) if total
 end
 
@@ -298,7 +307,28 @@ def display_result(result)
   prompt_pause(result)
 end
 
+def detect_winner(cards, totals)
+  winning_condition = evaluate_result(totals)
+  if winning_condition == :player_busted
+    winning_condition = :dealer_won
+  elsif winning_condition == :dealer_busted
+    winning_condition = :player_won
+  end
 
+  winning_condition
+end
+
+def display_tourney_winner(score)
+  clear_screen
+  puts ''
+  if scores[PLAYER] < score[HOUSE]
+    prompt_pause(:computer_won)
+    prompt_pause(:kidding)
+  else
+    prompt_pause(:player_won)
+  end
+  puts ''
+end
 # Auxillary methods
 def prompt_pause(action)
   puts ">> #{MESSAGES[action]}"
@@ -307,7 +337,7 @@ end
 
 def prompt(msg, new_line = false)
   puts ">> #{msg}"
-  puts if new_line
+  display_empty_line if new_line
 end
 
 def clear_screen
