@@ -32,13 +32,17 @@ MESSAGES = {
   MSG
   thank_you: "Thank you for playing #{WINNING_VALUE}!",
   quote: "Don't cry because it's over, smile because it happened. \n
-    - Dr. Seuss",
+  - Dr. Seuss",
   continue: 'Press Enter to continue.',
   title: "You are playing #{WINNING_VALUE}.",
   player_turn: "It's your turn.",
   players_hand: 'Your Hand:',
   player_action: 'Hit or Stay? (h/hit or s/stay)',
   player_busted: 'You busted, so the House wins!',
+  dealer_check_natural: 
+    "The dealer is checking for a natural #{WINNING_VALUE}...",
+  dealer_natural_yes: "The dealer has a natural #{WINNING_VALUE}!",
+  dealer_natural_no: "The dealer doesn't have a natural #{WINNING_VALUE}.",
   player_won: 'You won!',
   dealer_hand: "Dealer's Hand:",
   dealer_turn: "It's the dealer's turn.",
@@ -66,11 +70,14 @@ end
 def play_match
   cards = initialize_cards
   totals = initialize_totals
-  # binding.pry
   deal_cards(cards, totals)
   display_hands(cards, totals, hide_dealer_card: true)
-  player_turn(cards, totals)
-  dealer_turn(cards, totals) unless bust?(totals[:player])
+  natural_win(cards, totals)
+  hand_result = check_natural(totals)
+  if hand_result.nil?
+    player_turn(cards, totals)
+    dealer_turn(cards, totals) unless bust?(totals[:player])
+  end
   display_end_of_game(totals)
 end
 
@@ -148,42 +155,53 @@ def deal_card!(player, cards, totals)
   totals[player] = hand_total(cards[player])
 end
 
-# def hand_total(cards)
-#   sum = cards.reduce(0) { |sum, card| sum + value(card[1]) }
-
-#   cards.count { |_, rank| rank == 'A' }
-#        .times { sum += 10 if sum + 10 <= WINNING_VALUE }
-#   sum
-# end
-
 def hand_total(cards)
-  values = cards.map { |card| card[1] }
-  sum = 0
-  values.each do |value|
-    if value.include?('A')
-      sum += 1
-    elsif value.to_i.zero?
-      sum += 10
-    else
-      sum += value.to_i
-    end
-  end
+  sum = cards.reduce(0) { |sum, card| sum + value(card[1]) }
 
   cards.count { |_, rank| rank == 'A' }
-       .times { sum += 10 if sum + 10 <= WINNING_VALUE }
+       .times { sum -= 10 if sum - 10 <= WINNING_VALUE }
 
   sum
 end
 
-# def value(rank)
-#   if NUMBERED_RANKS.include?(rank)
-#     return rank.to_i
-#   elsif ROYAL_RANKS.include?(rank)
-#     return 10
-#   elsif rank == ACE
-#     return 1
-#   end
-# end
+def value(rank)
+  if NUMBERED_RANKS.include?(rank)
+    return rank.to_i
+  elsif ROYAL_RANKS.include?(rank)
+    return 10
+  elsif rank == ACE
+    return 11
+  end
+end
+
+def dealer_check_natural(totals)
+  prompt_pause(:dealer_check_natural)
+  display_loading_animation
+  if totals[:dealer] == WINNING_VALUE
+    prompt MESSAGES[:dealer_natural_yes]
+  else
+    prompt MESSAGES[:dealer_natural_no]
+  end
+end
+
+def check_natural(totals)
+  if totals[:player] == WINNING_VALUE &&
+     totals[:dealer] == WINNING_VALUE
+    prompt MESSAGES[:natural_push]
+    return :tie
+  elsif totals[:dealer] == WINNING_VALUE
+    :dealer_won
+  elsif totals[:player] == WINNING_VALUE
+    :player_won
+  end
+  nil
+end
+
+def natural_win(cards, totals)
+  unless WINNING_VALUE > 21
+    dealer_check_natural(totals) if value(cards[:dealer][0][1]) >= 10
+  end
+end
 
 # Display
 def display_welcome
@@ -197,6 +215,14 @@ end
 def display_goodbye
   prompt_pause(:thank_you)
   prompt_pause(:quote)
+end
+
+def display_loading_animation
+  3.times do
+    print ". "
+    sleep 0.5
+  end
+  puts
 end
 
 def display_hands(cards, totals, hide_dealer_card: false)
@@ -276,7 +302,7 @@ end
 # Auxillary methods
 def prompt_pause(action)
   puts ">> #{MESSAGES[action]}"
-  sleep(1.5)
+  sleep(SLEEP_DURATION)
 end
 
 def prompt(msg, new_line = false)
