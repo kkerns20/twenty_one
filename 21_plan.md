@@ -264,3 +264,40 @@ This one is a little tricky, and at first glance, you may think that either a "h
 - `dealer_stay?`
 - `play_again?` <!-- pull from ttt -->
 
+## Other additions
+
+### Loading animation
+
+- shuffling deck and checking naturals
+
+### Check natural 21s
+
+- def method `dealer_check_natural`
+    - prompt :dealer_check_natural
+    - loading_animation
+    - if dealer total == 21
+        - prompt natural_yes
+    - else
+        - prompt natural_no  
+
+- def method `check_natural`
+    - conditional if player and dealer's score == 21
+        - prompt natural_push
+    - elsif dealer's score == 21
+        - dealer_won
+    - elsif player_totals == 21
+        - player_won
+
+### Scoreboard and tournament loop
+
+- def winner
+    - set local variable winning_condition to return of evaluate results
+    - conditional if player busted
+        - winning_condition = dealer_won
+    - elsif dealer busted
+        - winning_condition = player_won
+    - return winning_condtion
+
+- def update_scoreboard
+
+- def game_over
