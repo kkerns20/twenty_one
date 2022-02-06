@@ -352,8 +352,8 @@ def bust?(total)
 end
 
 def dealer_stay?(total)
-  total >= FORCE_DEALER_STAY && 
-  total <= WINNING_VALUE
+  total >= FORCE_DEALER_STAY &&
+    total <= WINNING_VALUE
 end
 
 def play_again?
@@ -390,14 +390,14 @@ loop do
     cards = initialize_cards
     display_shuffling
     deal_player_in(cards, game_data)
-    
+
     play_single_round(game_data, cards)
-    
+
     winner = evaluate_result(game_data)
     game_over(game_data, winner)
     break if game_data.values.any? { |val| val[:score] >= TOURNEY_WINNER }
   end
-  
+
   display_tourney_winner(game_data)
 
   break unless play_again?
