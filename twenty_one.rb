@@ -32,6 +32,7 @@ MESSAGES = {
     - The hand value is the sum of all card values. Aces can be worth 1 or 11. 
     - A player busts and loses the game if their hand value exceeds 21.
     - The greater hand value wins if neither player busts.
+    - Tourney is first to 5 wins.
   MSG
   shuffling: 'Shuffling the deck!',
   thank_you: "Thank you for playing #{WINNING_VALUE}!",
@@ -43,22 +44,15 @@ MESSAGES = {
   players_hand: 'Your Hand:',
   player_action: 'Hit or Stay? (h/hit or s/stay)',
   player_busted: "You busted, so the #{HOUSE} wins!",
-  dealer_check_natural: 
-    "The dealer is checking for a natural #{WINNING_VALUE}...",
-  dealer_natural_yes: "The dealer has a natural #{WINNING_VALUE}!",
-  dealer_natural_no: "The dealer doesn't have a natural #{WINNING_VALUE}.",
   player_won: 'You won!',
   dealer_hand: "Dealer's Hand:",
-  dealer_turn: "It's the dealer's turn.",
   dealer_stay: 'Dealer must stay.',
-  dealer_hit: 'Dealer must hit.',
   dealer_busted: 'Dealer busted, so you win!',
   dealer_won: "Dealer won, so the #{HOUSE} won!",
-  house_won: "The #{HOUSE} appreciates you playing, and your money!",
+  house_victory: "The #{HOUSE} appreciates you playing, and your money!",
   player_victory: 'You ought to try your luck at Vegas! Congrats on winning!',
   tie: "It's a tie.",
-  tie_no_score: 'Due to the tie, score remains the same for the tourney...',
-  game_over: 'Game over.',
+  tourney_over: 'Tourney over.',
   play_again: 'Want to play again? (y/yes or n/no)',
   invalid_input: 'Please enter a valid input.',
   separator_line: '-' * 50
@@ -111,23 +105,19 @@ end
 
 # Dealer Action
 def dealer_turn(cards, game_data)
-  prompt MESSAGES[:dealer_turn]
   loop do
     display_hands(game_data)
-    sleep(SLEEP_DURATION)
     if bust?(game_data[:dealer][:total])
       break
     elsif dealer_stay?(game_data[:dealer][:total])
       prompt MESSAGES[:dealer_stay]
       break
     end
-    # binding.pry
-    prompt MESSAGES[:dealer_hit]
     deal_card!(:dealer, cards, game_data)
   end
 end
 
-def deal_cards(cards, game_data)
+def deal_player_in(cards, game_data)
   2.times do
     deal_card!(:player, cards, game_data)
     deal_card!(:dealer, cards, game_data)
@@ -160,47 +150,12 @@ def value(rank)
   end
 end
 
-def dealer_check_natural(game_data)
-  prompt_pause(:dealer_check_natural)
-  display_loading_animation
-  if game_data[:dealer][:total] == WINNING_VALUE
-    prompt MESSAGES[:dealer_natural_yes]
-    prompt MESSAGES[:dealer_won]
-    return 21
-  else
-    prompt MESSAGES[:dealer_natural_no]
-  end
-end
-
-def check_natural(game_data)
-  if game_data[:player][:total] == WINNING_VALUE &&
-     game_data[:dealer][:total] == WINNING_VALUE
-    prompt MESSAGES[:natural_push]
-    return :tie
-  elsif game_data[:dealer][:total] == WINNING_VALUE
-    :dealer_won
-  elsif game_data[:player][:total] == WINNING_VALUE
-    :player_won
-  end
-  nil
-end
-
-def natural_win(game_data)
-  unless WINNING_VALUE > 21
-    if value(game_data[:dealer][:hand][0][1]) == 10 ||
-       value(game_data[:dealer][:hand][0][1]) == 1
-      dealer_check_natural(game_data)
-    end
-  end
-end
-
 # Display
 def display_welcome
   clear_screen
-  # prompt_pause(:welcome)
-  # prompt_pause(:rules)
-  prompt_pause(:continue)
-  gets
+  prompt_pause(:welcome)
+  prompt_pause(:rules)
+  continue
 end
 
 def display_goodbye
@@ -228,7 +183,13 @@ end
 def display_hands(game_data, hide_dealer_card: false)
   clear_screen
 
-  prompt(MESSAGES[:title], true)
+  prompt MESSAGES[:title]
+  puts <<~MSG
+    -------------------------------------
+    SCOREBOARD: #{PLAYER}: [#{game_data[:player][:score]}] #{HOUSE}: [#{game_data[:dealer][:score]}]
+    -------------------------------------
+  MSG
+
   prompt MESSAGES[:players_hand]
   display_cards(game_data[:player][:hand], game_data[:player][:total])
 
@@ -246,7 +207,7 @@ def display_cards(cards, total = nil)
   puts middle_of_card(cards)
   puts bottom_of_card(cards)
   display_empty_line
-  prompt("Hand Total: #{total}", new_line: true) if total
+  prompt("Hand Total: #{total}") if total
 end
 
 def top_of_card(cards)
@@ -297,15 +258,45 @@ def display_result(result)
   prompt_pause(result)
 end
 
+def increase_score!(game_data, winner)
+  if winner == :player_busted || winner == :dealer_won
+    game_data[:dealer][:score] += 1
+  elsif winner == :dealer_busted || winner == :player_won
+    game_data[:player][:score] += 1
+  end
+end
+
+def game_over(game_data, winner)
+  increase_score!(game_data, winner)
+  display_winner(game_data, winner)
+  continue
+end
+
+def display_winner(game_data, winner)
+  unless winner == :player_busted ||
+    winner == :dealer_busted
+    display_hands(game_data, hide_dealer_card: false)
+  end
+  display_end_of_game(game_data)
+end
+
+def display_tourney_winner(game_data)
+  prompt_pause(:tourney_over)
+  if game_data[:player][:score] >= TOURNEY_WINNER
+    prompt_pause(:player_victory)
+  elsif game_data[:dealer][:score] >= TOURNEY_WINNER
+    prompt_pause(:house_victory)
+  end
+end
+
 # Auxillary methods
 def prompt_pause(action)
   puts ">> #{MESSAGES[action]}"
   sleep(SLEEP_DURATION)
 end
 
-def prompt(msg, new_line = false)
+def prompt(msg)
   puts ">> #{msg}"
-  display_empty_line if new_line
 end
 
 def clear_screen
@@ -346,23 +337,43 @@ def play_again?
   answer.start_with?('y')
 end
 
-display_welcome
+def play_single_round(game_data, cards)
+  display_hands(game_data, hide_dealer_card: true)
 
+  player_turn(cards, game_data)
+  dealer_turn(cards, game_data) unless bust?(game_data[:player][:total])
+end
+
+def fresh_hand(game_data)
+  game_data[:player][:hand] = []
+  game_data[:dealer][:hand] = []
+end
+
+def continue
+  prompt_pause(:continue)
+  gets
+end
+
+display_welcome
 
 loop do
   game_data = initialize_game_data
-  cards = initialize_cards
-  display_shuffling
-  deal_cards(cards, game_data)
-  display_hands(game_data, hide_dealer_card: true)
-  break if natural_win(game_data)
-  hand_result = check_natural(game_data)
-  if hand_result.nil?
-    player_turn(cards, game_data)
-    dealer_turn(cards, game_data) unless bust?(game_data[:player][:total])
+  loop do
+    fresh_hand(game_data)
+    cards = initialize_cards
+    display_shuffling
+    deal_player_in(cards, game_data)
+    
+    play_single_round(game_data, cards)
+    
+    winner = evaluate_result(game_data)
+    game_over(game_data, winner)
+    break if game_data.values.any? { |val| val[:score] >= TOURNEY_WINNER }
   end
-  display_end_of_game(game_data)
+  
+  display_tourney_winner(game_data)
+
   break unless play_again?
 end
 
-display_goodbye
+quit_game
