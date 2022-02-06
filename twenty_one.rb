@@ -1,10 +1,12 @@
-# twenty_one.rb
+# Twenty One
 
-require 'pry-byebug'
+# CONSTANTS
+# ============================================================================
 
 WINNING_VALUE = 21
 FORCE_DEALER_STAY = 17
 TOURNEY_WINNER = 5
+
 PLAYER = 'Player'.freeze
 HOUSE = 'House'.freeze
 
@@ -20,7 +22,9 @@ SUIT_SYMBOLS = {
   'C' => "\u2663",
   '*' => '*'
 }.freeze
+
 SLEEP_DURATION = 1.5
+YES_OR_NO = %w(y n yes no).freeze
 
 MESSAGES = {
   welcome: "Welcome to #{WINNING_VALUE}!",
@@ -57,8 +61,8 @@ MESSAGES = {
   invalid_input: 'Please enter a valid input.',
   separator_line: '-' * 50
 }.freeze
-YES_OR_NO = %w(y n yes no).freeze
 
+# Initialization
 def initialize_cards
   { deck: initialize_deck}
 end
@@ -79,6 +83,7 @@ def initialize_deck
 end
 
 # Player Action
+
 def player_turn(cards, game_data)
   prompt MESSAGES[:player_turn]
   action = nil
@@ -104,6 +109,7 @@ def query_player_action
 end
 
 # Dealer Action
+
 def dealer_turn(cards, game_data)
   loop do
     display_hands(game_data)
@@ -117,6 +123,8 @@ def dealer_turn(cards, game_data)
   end
 end
 
+# Dealing Cards
+
 def deal_player_in(cards, game_data)
   2.times do
     deal_card!(:player, cards, game_data)
@@ -128,6 +136,8 @@ def deal_card!(player, cards, game_data)
   game_data[player][:hand] << cards[:deck].pop
   game_data[player][:total] = hand_total(game_data[player][:hand])
 end
+
+# Hand Calculation
 
 def hand_total(hand)
   sum = hand.reduce(0) do |sum, card| 
@@ -151,6 +161,7 @@ def value(rank)
 end
 
 # Display
+
 def display_welcome
   clear_screen
   prompt_pause(:welcome)
@@ -224,6 +235,8 @@ def middle_of_card(cards)
   end
 end
 
+# Results
+
 def display_end_of_game(game_data)
   result = evaluate_result(game_data)
   display_totals(game_data) if %i(player_won dealer_won tie).include?(result)
@@ -258,6 +271,8 @@ def display_result(result)
   prompt_pause(result)
 end
 
+# Tourney
+
 def increase_score!(game_data, winner)
   if winner == :player_busted || winner == :dealer_won
     game_data[:dealer][:score] += 1
@@ -290,6 +305,7 @@ def display_tourney_winner(game_data)
 end
 
 # Auxillary methods
+
 def prompt_pause(action)
   puts ">> #{MESSAGES[action]}"
   sleep(SLEEP_DURATION)
@@ -301,6 +317,11 @@ end
 
 def clear_screen
   system 'clear'
+end
+
+def continue
+  prompt_pause(:continue)
+  gets
 end
 
 def valid_input
@@ -337,6 +358,9 @@ def play_again?
   answer.start_with?('y')
 end
 
+# PLAY TWENTY ONE
+# ============================================================================
+
 def play_single_round(game_data, cards)
   display_hands(game_data, hide_dealer_card: true)
 
@@ -349,10 +373,7 @@ def fresh_hand(game_data)
   game_data[:dealer][:hand] = []
 end
 
-def continue
-  prompt_pause(:continue)
-  gets
-end
+# Game loop
 
 display_welcome
 

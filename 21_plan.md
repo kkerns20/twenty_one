@@ -104,6 +104,7 @@ This one is a little tricky, and at first glance, you may think that either a "h
 ### play_twenty_one
 
 - `display_welcome`
+- set game_data for everything we do in the loop
 - main loop
     - `play_match`
     - break unless `play_again?`
@@ -111,6 +112,7 @@ This one is a little tricky, and at first glance, you may think that either a "h
 
 ### play_match
 
+- def fresh_hand
 - local variable `cards` set to `initialize_cards`
 - local variable `totals` set to `initialize_totals`
 - `deal_cards`
