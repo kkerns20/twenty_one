@@ -1,5 +1,7 @@
 # Twenty One
 
+require 'pry-byebug'
+
 # CONSTANTS
 # ============================================================================
 
@@ -113,12 +115,15 @@ end
 def dealer_turn(cards, game_data)
   loop do
     display_hands(game_data)
+    sleep(SLEEP_DURATION)
+
     if bust?(game_data[:dealer][:total])
       break
     elsif dealer_stay?(game_data[:dealer][:total])
-      prompt MESSAGES[:dealer_stay]
+      prompt_pause(:dealer_stay)
       break
     end
+
     deal_card!(:dealer, cards, game_data)
   end
 end
@@ -347,7 +352,8 @@ def bust?(total)
 end
 
 def dealer_stay?(total)
-  total >= FORCE_DEALER_STAY
+  total >= FORCE_DEALER_STAY && 
+  total <= WINNING_VALUE
 end
 
 def play_again?
