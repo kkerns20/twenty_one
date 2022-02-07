@@ -9,13 +9,13 @@ WINNING_VALUE = 21
 FORCE_DEALER_STAY = 17
 TOURNEY_WINNER = 5
 
-PLAYER = 'Player'.freeze
-HOUSE = 'House'.freeze
+PLAYER = 'Player'
+HOUSE = 'House'
 
-SUITS = %w(S H D C).freeze
+SUITS = %w(S H D C)
 NUMBERED_RANKS = (2..10).map(&:to_s)
-ROYAL_RANKS = %w(J Q K).freeze
-ACE = 'A'.freeze
+ROYAL_RANKS = %w(J Q K)
+ACE = 'A'
 RANKS = NUMBERED_RANKS + ROYAL_RANKS + [ACE]
 SUIT_SYMBOLS = {
   'S' => "\u2660",
@@ -23,23 +23,28 @@ SUIT_SYMBOLS = {
   'D' => "\u2666",
   'C' => "\u2663",
   '*' => '*'
-}.freeze
+}
 
 SLEEP_DURATION = 1.5
-YES_OR_NO = %w(y n yes no).freeze
+YES_OR_NO = %w(y n yes no)
 
 MESSAGES = {
   welcome: "Welcome to #{WINNING_VALUE}!",
-  rules: <<~MSG,
+  rules: <<~RULES,
     Rules of the Game:
+    - You are playing a tournament against the House, \
+    who employs a dealer.
     - You and the dealer will each be dealt 2 cards.
     - You play first, and then the dealer will play.
     - You can choose to hit (draw) or stay (don't draw).
+  RULES
+  info: <<~INFO,
+    Gameplay information:
     - The hand value is the sum of all card values. Aces can be worth 1 or 11. 
     - A player busts and loses the game if their hand value exceeds 21.
     - The greater hand value wins if neither player busts.
     - Tourney is first to 5 wins.
-  MSG
+  INFO
   shuffling: 'Shuffling the deck!',
   thank_you: "Thank you for playing #{WINNING_VALUE}!",
   quote: "Don't cry because it's over, smile because it happened. \n
@@ -62,11 +67,11 @@ MESSAGES = {
   play_again: 'Want to play again? (y/yes or n/no)',
   invalid_input: 'Please enter a valid input.',
   separator_line: '-' * 50
-}.freeze
+}
 
 # Initialization
 def initialize_cards
-  { deck: initialize_deck}
+  { deck: initialize_deck }
 end
 
 def initialize_game_data
@@ -145,23 +150,23 @@ end
 # Hand Calculation
 
 def hand_total(hand)
-  sum = hand.reduce(0) do |sum, card| 
-          sum + value(card[1]) 
-        end
+  sum = hand.reduce(0) do |accumulation, card|
+    accumulation + value(card[1])
+  end
 
   hand.count { |_, rank| rank == 'A' }
-       .times { sum += 10 if sum + 10 <= WINNING_VALUE }
+      .times { sum += 10 if sum + 10 <= WINNING_VALUE }
 
   sum
 end
 
 def value(rank)
   if NUMBERED_RANKS.include?(rank)
-    return rank.to_i
+    rank.to_i
   elsif ROYAL_RANKS.include?(rank)
-    return 10
+    10
   elsif rank == ACE
-    return 1
+    1
   end
 end
 
@@ -171,6 +176,8 @@ def display_welcome
   clear_screen
   prompt_pause(:welcome)
   prompt_pause(:rules)
+  display_empty_line
+  prompt_pause(:info)
   continue
 end
 
@@ -196,6 +203,7 @@ def display_shuffling
   display_loading_animation
 end
 
+# rubocop:disable Metrics/AbcSize
 def display_hands(game_data, hide_dealer_card: false)
   clear_screen
 
@@ -216,6 +224,7 @@ def display_hands(game_data, hide_dealer_card: false)
     display_cards(game_data[:dealer][:hand], game_data[:dealer][:total])
   end
 end
+# rubocop:enable Metrics/AbcSize
 
 def display_cards(cards, total = nil)
   display_empty_line
@@ -276,7 +285,7 @@ def display_result(result)
   prompt_pause(result)
 end
 
-# Tourney
+# Scoreboard and winning
 
 def increase_score!(game_data, winner)
   if winner == :player_busted || winner == :dealer_won
@@ -287,14 +296,14 @@ def increase_score!(game_data, winner)
 end
 
 def game_over(game_data, winner)
-  increase_score!(game_data, winner)
   display_winner(game_data, winner)
+  increase_score!(game_data, winner)
   continue
 end
 
 def display_winner(game_data, winner)
   unless winner == :player_busted ||
-    winner == :dealer_busted
+         winner == :dealer_busted
     display_hands(game_data, hide_dealer_card: false)
   end
   display_end_of_game(game_data)
