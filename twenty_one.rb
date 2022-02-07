@@ -60,13 +60,14 @@ MESSAGES = {
   dealer_stay: 'Dealer must stay.',
   dealer_busted: 'Dealer busted, so you win!',
   dealer_won: "Dealer won, so the #{HOUSE} won!",
-  house_victory: "The #{HOUSE} appreciates you playing, and your money!",
+  house_victory: "The #{HOUSE} appreciates you playing and, \
+    of course, your money!",
   player_victory: 'You ought to try your luck at Vegas! Congrats on winning!',
   tie: "It's a tie.",
   tourney_over: 'Tourney over.',
   play_again: 'Want to play again? (y/yes or n/no)',
   invalid_input: 'Please enter a valid input.',
-  separator_line: '-' * 50
+  separator_line: '-' * 70
 }
 
 # Initialization
