@@ -1,7 +1,5 @@
 # Twenty One
 
-require 'pry-byebug'
-
 # CONSTANTS
 # ============================================================================
 
@@ -71,6 +69,7 @@ MESSAGES = {
 }
 
 # Initialization
+
 def initialize_cards
   { deck: initialize_deck }
 end
