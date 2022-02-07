@@ -58,10 +58,10 @@ Style/EmptyLiteral:
 
 Style/FrozenStringLiteralComment:
   Enabled: false
-  Description: Require the addition of the frozen string literal comment.
+  Description: 'Require the addition of the frozen string literal comment.'
 
 Style/GuardClause:
-  Description: Check for conditionals that can be replaced with guard clauses.
+  Description: 'Check for conditionals that can be replaced with guard clauses.'
   Enabled: false
 
 Style/HashSyntax:
@@ -80,19 +80,19 @@ Style/IfUnlessModifier:
   Enabled: false
 
 Style/InlineComment:
-  Description: Avoid inline comments.
+  Description: 'Avoid inline comments.'
   Enabled: false
 
 Style/MethodCallWithoutArgsParentheses:
-  Description: Do not use parentheses for method calls with no arguments.
+  Description: 'Do not use parentheses for method calls with no arguments.'
   Enabled: true
 
 Style/ModuleFunction:
-  Description: Checks for usage of `extend self` in modules.
+  Description: "Checks for usage of `extend self` in modules."
   Enabled: false
 
 Style/MutableConstant:
-  Description: Freeze mutable constants.
+  Description: 'Freeze mutable constants.'
   Enabled: false
 
 Style/NegatedIf:
@@ -110,7 +110,7 @@ Style/Next:
   Enabled: false
 
 Style/NumericLiterals:
-  Description: Add underscores to large numeric literals to improve their readability.
+  Description: 'Add underscores to large numeric literals to improve their readability.'
   Enabled: false
 
 Style/NumericPredicate:
@@ -124,7 +124,7 @@ Style/OneLineConditional:
   Enabled: false
 
 Naming/BinaryOperatorParameterName:
-  Description: When defining binary operators, name the argument other.
+  Description: 'When defining binary operators, name the argument other.'
   Enabled: false
 
 Style/ParenthesesAroundCondition:
@@ -150,15 +150,15 @@ Style/PercentLiteralDelimiters:
     '%x': ()
 
 Style/PerlBackrefs:
-  Description: Avoid Perl-style regex back references.
+  Description: 'Avoid Perl-style regex back references.'
   Enabled: false
 
 Style/Proc:
-  Description: Use proc instead of Proc.new.
+  Description: 'Use proc instead of Proc.new.'
   Enabled: false
 
 Style/RedundantFetchBlock:
-  Description: Only way to keep FetchBlock warning from popping up.
+  Description: 'Only way to keep FetchBlock warning from popping up.'
   Enabled: true
 
 Style/RedundantParentheses:
@@ -184,18 +184,18 @@ Style/SafeNavigation:
   Enabled: false
 
 Style/SingleLineBlockParams:
-  Description: Enforces the names of some block params.
+  Description: 'Enforces the names of some block params.'
   Enabled: false
 
 Style/SingleLineMethods:
-  Description: Avoid single-line methods.
+  Description: 'Avoid single-line methods.'
   Enabled: false
 
 Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 
 Style/StringLiterals:
-  Description: Force use of single or double quotes when no interpolation
+  Description: 'Force use of single or double quotes when no interpolation'
   Enabled: false
 
 Style/SymbolArray:
@@ -204,7 +204,7 @@ Style/SymbolArray:
   Enabled: false
 
 Style/WhileUntilModifier:
-  Description: Favor modifier while/until usage when you have a single-line body.
+  Description: 'Favor modifier while/until usage when you have a single-line body.'
   Enabled: false
 
 Style/WordArray:
@@ -219,7 +219,7 @@ Metrics/AbcSize:
   Max: 18
 
 Metrics/BlockLength:
-  Description: Limit size of blocks.
+  Description: 'Limit size of blocks.'
   Enabled: false
 
 Metrics/ClassLength:
@@ -227,7 +227,7 @@ Metrics/ClassLength:
   Enabled: false
 
 Layout/LineLength:
-  Description: Limit lines to 80 characters.
+  Description: 'Limit lines to 80 characters.'
   Enabled: true
   Max: 80
   StyleGuide: https://rubystyle.guide/#80-character-limits
