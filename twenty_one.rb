@@ -1,5 +1,7 @@
 # Twenty One
 
+require 'pry-byebug'
+
 # CONSTANTS
 # ============================================================================
 
@@ -58,8 +60,7 @@ MESSAGES = {
   dealer_stay: 'Dealer must stay.',
   dealer_busted: 'Dealer busted, so you win!',
   dealer_won: "Dealer won, so the #{HOUSE} won!",
-  house_victory: "The #{HOUSE} appreciates you playing and, \
-    of course, your money!",
+  house_victory: "The #{HOUSE} appreciates you playing and, of course, your money!",
   player_victory: 'You ought to try your luck at Vegas! Congrats on winning!',
   tie: "It's a tie.",
   tourney_over: 'Tourney over.',
@@ -69,7 +70,6 @@ MESSAGES = {
 }
 
 # Initialization
-
 def initialize_cards
   { deck: initialize_deck }
 end
@@ -119,7 +119,7 @@ end
 
 def dealer_turn(cards, game_data)
   loop do
-    display_hands(game_data)
+    display_hands(game_data, hide_dealer_card: false)
     sleep(SLEEP_DURATION)
 
     if bust?(game_data[:dealer][:total])
@@ -203,7 +203,6 @@ def display_shuffling
   display_loading_animation
 end
 
-# rubocop:disable Metrics/AbcSize
 def display_hands(game_data, hide_dealer_card: false)
   clear_screen
 
@@ -213,18 +212,25 @@ def display_hands(game_data, hide_dealer_card: false)
     SCOREBOARD: #{PLAYER}: [#{game_data[:player][:score]}] #{HOUSE}: [#{game_data[:dealer][:score]}]
     -------------------------------------
   MSG
-
   prompt MESSAGES[:players_hand]
-  display_cards(game_data[:player][:hand], game_data[:player][:total])
-
+  display_player_hand(game_data)
+  display_empty_line
   prompt MESSAGES[:dealer_hand]
-  if hide_dealer_card
-    display_cards([game_data[:dealer][:hand][0], ['*', '*']])
-  else
-    display_cards(game_data[:dealer][:hand], game_data[:dealer][:total])
-  end
+  display_hidden_dealer_hand(game_data) if hide_dealer_card
+  display_full_dealer_hand(game_data) if !hide_dealer_card
 end
-# rubocop:enable Metrics/AbcSize
+
+def display_player_hand(game_data)
+  display_cards(game_data[:player][:hand], game_data[:player][:total])
+end
+
+def display_hidden_dealer_hand(game_data)
+  display_cards([game_data[:dealer][:hand][0], ['*', '*']])
+end
+
+def display_full_dealer_hand(game_data)
+  display_cards(game_data[:dealer][:hand], game_data[:dealer][:total])
+end
 
 def display_cards(cards, total = nil)
   display_empty_line
